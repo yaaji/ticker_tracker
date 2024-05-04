@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %} Home Page {% endblock %}
+
+{% block content %} 
+
+    <h1>Ticker Tracker</h1>
+    <div class="col-lg-8 px-0">
+        <p class="fs-5">It's very important to track the stock market.</p>
+
+        <hr class="col-1 my-4">
+
+        <form class="row">
+            <div class="col">
+                <label for="ticker" class="form-label">Ticker</label>
+                <input type="text" name="ticker" class="form-control" id="ticker" placeholder="Ticker" value="{{ticker.symbol}}">
+            </div>
+            <div class="col">
+                <label for="start" class="form-label">Start Date</label>
+                <input type="date" name="start" class="form-control" id="start" placeholder="Start Date" value="{{start}}">
+            </div>
+            <div class="col">
+                <label for="end" class="form-label">End Date</label>
+                <input type="date" name="end" class="form-control" id="end" placeholder="End Date" value="{{end}}">
+            </div>
+            <div class="col">
+                <button type="submit" class="btn btn-primary" style="margin-top:30px">Submit</button>
+            </div>
+        </form>
+    </div>     
+
+    {% if ticker %}
+        <hr class="col-1 my-4">
+
+        <h1>{{ticker.shortName}} <span class="badge text-bg-primary rounded-pill">{{ticker.currentPrice}} {{ticker.financialCurrency}}</span></h1>
+        <p>{{ticker.country}} / {{ticker.sector}} / {{ticker.industry}}</p>
+
+        <div id="plot"></div>
+
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        <script>
+            var res = {{ graph|safe }};
+            
+            console.log(res);
+            var graph = JSON.parse( res );
+            Plotly.newPlot('plot', graph.data, graph.layout );
+        </script>
+
+        <h2>Actual Data</h2>
+        <table class="table">
+            <tr>
+                <th>Date</th>
+                <th>Open</th>
+                <th>Close</th>
+                <th>High</th>
+                <th>Low</th>
+                <th>Volume</th>
+            </tr>
+            {% for record in data %}
+            <tr>
+                <td>{{record.Date}}</td>
+                <td>{{record.Open|floatformat:2}}</td>
+                <td>{{record.Close|floatformat:2}}</td>
+                <td>{{record.High|floatformat:2}}</td>
+                <td>{{record.Low|floatformat:2}}</td>
+                <td>{{record.Volume|floatformat:0}}</td>
+            </tr>
+            {% endfor %}
+
+        </table>
+
+
+            <!--ul class="list-group">
+                {% for officer in ticker.companyOfficers %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{officer.name}} <br/>
+                        <small>{{officer.title}}</small>
+                    </li>
+                {% endfor %}
+            </ul-->
+
+    {% endif %}
+
+{% endblock %}
